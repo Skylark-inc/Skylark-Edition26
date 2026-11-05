@@ -16,7 +16,7 @@
  --disabled:#d2d2d7;--disabled-text:#86868b;--border:rgba(0,0,0,.08);
  --warning-bg:rgba(255,159,10,.10);--warning-border:rgba(255,159,10,.24);
  --danger-bg:rgba(255,59,48,.10);--danger-border:rgba(255,59,48,.24);
- --cyan:#7ee8ff;--purple:#a998ff;--sky:#54aaff;--shadow:0 18px 55px rgba(0,0,0,.08)
+ --cyan:#7ee8ff;--purple:#a998ff;--sky:#54aaff;--gradient-speed:20s;--gradient-play:running;--shadow:0 18px 55px rgba(0,0,0,.08)
 }
 html[data-theme="dark"]{
  --background:#000;--surface:rgba(28,28,30,.76);--text:#f5f5f7;--muted:#a1a1a6;
@@ -53,11 +53,11 @@ html[data-theme="dark"] .theme-toggle{background:rgba(28,28,30,.5)}
  radial-gradient(circle at 74% 28%,var(--purple),transparent 43%),
  radial-gradient(circle at 52% 72%,var(--sky),transparent 48%);
  filter:blur(62px);opacity:.58;transform:translate(-50%,-50%);
- animation:gradient-drift 20s ease-in-out infinite alternate}
+ animation:gradient-drift var(--gradient-speed) ease-in-out infinite alternate;animation-play-state:var(--gradient-play)}
 @keyframes gradient-drift{
- 0%{transform:translate(-50%,-50%) rotate(-7deg) scale(1)}
- 50%{transform:translate(-47%,-53%) rotate(9deg) scale(1.08)}
- 100%{transform:translate(-53%,-47%) rotate(-8deg) scale(1.03)}
+ 0%{transform:translate(-60%,-43%) rotate(-15deg) scale(.94)}
+ 50%{transform:translate(-39%,-59%) rotate(20deg) scale(1.2)}
+ 100%{transform:translate(-56%,-40%) rotate(-19deg) scale(1.04)}
 }
 .hero:after{content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;
  background:linear-gradient(to bottom,transparent 12%,var(--background) 97%)}
@@ -118,6 +118,56 @@ footer{width:min(1000px,calc(100% - 36px));margin:0 auto;
  color:var(--muted);font-size:12px;line-height:1.6}
 .footer-links{display:flex;flex-wrap:wrap;gap:8px 18px;margin-bottom:10px}
 .footer-links a{color:var(--muted)}
+
+/* Gradient Studio: one adaptive appearance control */
+.studio-trigger{position:relative;z-index:31}
+.studio-overlay{display:none;position:fixed;inset:0;z-index:40;background:transparent}
+.studio-overlay.open{display:block}
+.studio-panel{position:fixed;z-index:41;top:calc(70px + env(safe-area-inset-top));right:max(18px,calc((100vw - 1100px)/2));
+ width:min(370px,calc(100vw - 32px));max-height:calc(100dvh - 92px - env(safe-area-inset-top));overflow-y:auto;
+ background:rgba(255,255,255,.94);color:var(--text);border:1px solid var(--border);
+ border-radius:24px;padding:23px;box-shadow:0 24px 85px rgba(0,0,0,.19);
+ backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);
+ opacity:0;visibility:hidden;transform:translateY(-8px) scale(.98);transition:opacity .22s,transform .22s,visibility .22s}
+html[data-theme="dark"] .studio-panel{background:rgba(28,28,30,.96);box-shadow:0 24px 85px rgba(0,0,0,.65)}
+.studio-panel.open{opacity:1;visibility:visible;transform:none}
+.studio-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}
+.studio-head h2{margin:0;font-size:21px;letter-spacing:-.035em}
+.studio-close{border:0;border-radius:50%;width:30px;height:30px;background:var(--disabled);color:var(--text);font-size:21px;cursor:pointer}
+.studio-label{font-size:13px;font-weight:650;margin:0 0 10px;color:var(--muted)}
+.studio-segment{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:4px;border-radius:12px;background:var(--disabled)}
+.studio-segment button{min-height:37px;border:0;border-radius:9px;background:transparent;color:var(--text);font:inherit;font-size:13px;cursor:pointer}
+.studio-segment button[aria-pressed="true"]{background:var(--surface);box-shadow:0 1px 6px rgba(0,0,0,.12);font-weight:700}
+.studio-rule{height:1px;background:var(--border);margin:21px 0}
+.palette-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px 7px}
+.palette-option{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;border:0;background:none;color:var(--muted);font:inherit;font-size:11px;cursor:pointer;padding:2px}
+.palette-swatch{width:56px;max-width:100%;aspect-ratio:1;border-radius:15px;border:3px solid transparent;box-shadow:0 0 0 1px var(--border);transition:transform .2s}
+.palette-option[aria-pressed="true"] .palette-swatch{border-color:var(--blue);box-shadow:0 0 0 2px var(--background),0 0 0 4px var(--blue)}
+.palette-option[aria-pressed="true"]{color:var(--text);font-weight:700}
+.palette-option:hover .palette-swatch{transform:scale(1.05)}
+.studio-toggle-row,.studio-speed-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.studio-toggle-row label{font-size:15px;font-weight:600}
+.studio-switch{position:relative;width:47px;height:29px;flex-shrink:0;appearance:none;border-radius:20px;background:var(--disabled);cursor:pointer;transition:background .2s}
+.studio-switch:checked{background:#34c759}
+.studio-switch:after{content:"";position:absolute;top:3px;left:3px;width:23px;height:23px;border-radius:50%;background:white;box-shadow:0 1px 3px #0003;transition:transform .2s}
+.studio-switch:checked:after{transform:translateX(18px)}
+.studio-speed-heading{margin:18px 0 8px;font-size:14px}
+.studio-speed-heading output{font-variant-numeric:tabular-nums;color:var(--muted)}
+.studio-range{width:100%;accent-color:var(--blue);cursor:pointer}
+.studio-range:disabled{opacity:.35;cursor:not-allowed}
+.studio-range-ends{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.studio-reset{width:100%;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:12px;min-height:43px;font:inherit;font-weight:600;cursor:pointer}
+.studio-note{margin:11px 0 0;font-size:12px;line-height:1.5;color:var(--muted)}
+@media(max-width:700px){
+ .studio-overlay.open{background:rgba(0,0,0,.34)}
+ .studio-panel{top:auto;bottom:0;right:0;left:0;width:100%;max-height:min(86dvh,780px);
+ border-radius:26px 26px 0 0;padding:24px 24px calc(24px + env(safe-area-inset-bottom));
+ transform:translateY(105%);opacity:1;visibility:hidden}
+ .studio-panel.open{transform:translateY(0);visibility:visible}
+ .studio-panel:before{content:"";display:block;width:37px;height:5px;border-radius:6px;background:var(--muted);opacity:.35;margin:-10px auto 18px}
+}
+@media(prefers-reduced-motion:reduce){.studio-panel{transition:none}}
+
 @media(max-width:600px){
  .topbar{width:calc(100% - 28px)}.hero{min-height:700px;padding-top:calc(115px + env(safe-area-inset-top))}
  .download-zone{width:100%}.section{padding:75px 0}
@@ -132,13 +182,35 @@ footer{width:min(1000px,calc(100% - 36px));margin:0 auto;
 <body>
 <nav class="topbar">
  <a class="brand" href="https://skylark-inc.github.io/">Skylark</a>
- <button class="theme-toggle" id="themeToggle" type="button" aria-label="Change appearance" title="Change appearance">
+ <button class="theme-toggle studio-trigger" id="themeToggle" type="button" aria-label="Open Gradient Studio" title="Gradient Studio" aria-controls="gradientStudio" aria-expanded="false">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-   <circle cx="12" cy="12" r="4"></circle>
-   <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+   <circle cx="12" cy="12" r="9"></circle><circle cx="8" cy="8" r="1"/><circle cx="15" cy="7" r="1"/><circle cx="17" cy="13" r="1"/><circle cx="10" cy="16" r="1"/>
+   <path d="M12 12c-1.6 0-2.2 2-1 3 1.1 1.1 3.5.5 3.5-1.2 0-.9-.8-1.6-2.5-1.8"/>
   </svg>
  </button>
 </nav>
+<div class="studio-overlay" id="studioOverlay" aria-hidden="true"></div>
+<aside class="studio-panel" id="gradientStudio" role="dialog" aria-modal="true" aria-labelledby="studioTitle" aria-hidden="true">
+ <div class="studio-head"><h2 id="studioTitle">Gradient Studio</h2><button type="button" class="studio-close" id="studioClose" aria-label="Close Gradient Studio">×</button></div>
+ <p class="studio-label">Appearance</p>
+ <div class="studio-segment" role="group" aria-label="Appearance">
+  <button type="button" data-appearance="light" aria-pressed="false">☀ Light</button>
+  <button type="button" data-appearance="dark" aria-pressed="false">☾ Dark</button>
+  <button type="button" data-appearance="system" aria-pressed="true">System</button>
+ </div>
+ <div class="studio-rule"></div>
+ <p class="studio-label">Gradient colors</p>
+ <div class="palette-grid" id="paletteGrid" role="group" aria-label="Gradient color palette"></div>
+ <div class="studio-rule"></div>
+ <div class="studio-toggle-row"><label for="animationToggle">Animate background</label><input id="animationToggle" class="studio-switch" type="checkbox" checked></div>
+ <div class="studio-speed-heading"><label for="animationSpeed">Animation speed</label><output id="speedValue" for="animationSpeed">20s</output></div>
+ <input id="animationSpeed" class="studio-range" type="range" min="5" max="60" step="1" value="20">
+ <div class="studio-range-ends"><span>Faster</span><span>Slower</span></div>
+ <div class="studio-rule"></div>
+ <button type="button" class="studio-reset" id="studioReset">Restore defaults</button>
+ <p class="studio-note" id="motionNote" hidden>Reduce Motion is enabled on this device, so background animation is paused.</p>
+</aside>
+
 <main>
  <section class="hero">
   <div class="gradient" aria-hidden="true"></div>
@@ -337,23 +409,114 @@ function showNewEdition(entry){
  $("newEditionLink").href=pageFor(entry);
  show("newEditionNotice");
 }
-function savedTheme(){try{return localStorage.getItem("skylark-theme");}catch{return null;}}
-function setTheme(theme){document.documentElement.dataset.theme=theme;}
-const media=matchMedia("(prefers-color-scheme: dark)");
-function initTheme(){
- const saved=savedTheme();
- setTheme(saved==="light"||saved==="dark"?saved:(media.matches?"dark":"light"));
+/* Gradient Studio is independent of edition loading and download routing. */
+const PALETTES=[
+ {id:"skylark",name:"Skylark",light:["#7ee8ff","#a998ff","#54aaff"],dark:["#138aa9","#6754c5","#1378c5"]},
+ {id:"sunset",name:"Sunset",light:["#ff956c","#ffd38a","#d4a5ff"],dark:["#c4533e","#bd7b24","#7950b8"]},
+ {id:"ocean",name:"Ocean",light:["#217dd1","#58d9d0","#8aafff"],dark:["#135aa4","#0a9b91","#4b64bd"]},
+ {id:"rose",name:"Rose",light:["#ff78b2","#ffc3d7","#bc95ff"],dark:["#b92c72","#a94778","#7353bd"]},
+ {id:"aurora",name:"Aurora",light:["#58dcb2","#72baff","#aa8bff"],dark:["#159b79","#306cbe","#6550bb"]},
+ {id:"ember",name:"Ember",light:["#ff754e","#ffbb69","#e66a9a"],dark:["#b9432d","#b46a22","#a83d71"]},
+ {id:"lavender",name:"Lavender",light:["#a88bff","#d3b6ff","#8faeff"],dark:["#6852bc","#8765b8","#4a68b0"]},
+ {id:"mint",name:"Mint",light:["#5dd8b0","#9cebd3","#76c9ed"],dark:["#148f72","#3c9c87","#277caa"]}
+];
+const DEFAULT_STUDIO={appearance:"system",palette:"skylark",speed:20,animated:true};
+const STUDIO_KEY="skylark-gradient-studio-v1";
+const systemTheme=window.matchMedia("(prefers-color-scheme: dark)");
+const reducedMotion=window.matchMedia("(prefers-reduced-motion: reduce)");
+function readStored(key){try{return localStorage.getItem(key);}catch{return null;}}
+function saveStudio(){try{localStorage.setItem(STUDIO_KEY,JSON.stringify(studio));}catch{}}
+function loadStudio(){
+ let input={};
+ try{input=JSON.parse(readStored(STUDIO_KEY)||"{}")||{};}catch{}
+ const legacy=readStored("skylark-theme");
+ const appearance=["light","dark","system"].includes(input.appearance)?input.appearance:
+  (["light","dark"].includes(legacy)?legacy:"system");
+ return {
+  appearance,
+  palette:PALETTES.some(p=>p.id===input.palette)?input.palette:"skylark",
+  speed:Number.isFinite(Number(input.speed))?Math.max(5,Math.min(60,Number(input.speed))):20,
+  animated:typeof input.animated==="boolean"?input.animated:true
+ };
 }
-$("themeToggle").addEventListener("click",()=>{
- const next=document.documentElement.dataset.theme==="dark"?"light":"dark";
- setTheme(next);
- try{localStorage.setItem("skylark-theme",next);}catch{}
+let studio=loadStudio();
+const panel=$("gradientStudio"),overlay=$("studioOverlay"),trigger=$("themeToggle");
+function resolvedTheme(){return studio.appearance==="system"?(systemTheme.matches?"dark":"light"):studio.appearance;}
+function applyStudio(){
+ const theme=resolvedTheme(),palette=PALETTES.find(p=>p.id===studio.palette)||PALETTES[0];
+ document.documentElement.dataset.theme=theme;
+ document.documentElement.style.colorScheme=theme;
+ const colors=palette[theme];
+ document.documentElement.style.setProperty("--cyan",colors[0]);
+ document.documentElement.style.setProperty("--purple",colors[1]);
+ document.documentElement.style.setProperty("--sky",colors[2]);
+ document.documentElement.style.setProperty("--gradient-speed",studio.speed+"s");
+ document.documentElement.style.setProperty("--gradient-play",studio.animated&&!reducedMotion.matches?"running":"paused");
+ $("animationSpeed").value=String(studio.speed);
+ $("speedValue").textContent=studio.speed+"s";
+ $("animationToggle").checked=studio.animated;
+ $("animationSpeed").disabled=!studio.animated;
+ $("motionNote").hidden=!reducedMotion.matches;
+ document.querySelectorAll("[data-appearance]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.appearance===studio.appearance)));
+ document.querySelectorAll("[data-palette]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.palette===studio.palette)));
+}
+function renderPalettes(){
+ const grid=$("paletteGrid");
+ for(const p of PALETTES){
+  const b=document.createElement("button");b.type="button";b.className="palette-option";
+  b.dataset.palette=p.id;b.setAttribute("aria-label",p.name+" palette");b.setAttribute("aria-pressed","false");
+  const swatch=document.createElement("span");swatch.className="palette-swatch";
+  swatch.style.background=`linear-gradient(135deg,${p.light.join(",")})`;
+  const name=document.createElement("span");name.textContent=p.name;
+  b.append(swatch,name);
+  b.addEventListener("click",()=>{studio.palette=p.id;saveStudio();applyStudio();});
+  grid.append(b);
+ }
+}
+let previouslyFocused=null;
+function openStudio(){
+ previouslyFocused=document.activeElement;
+ overlay.classList.add("open");panel.classList.add("open");
+ panel.setAttribute("aria-hidden","false");trigger.setAttribute("aria-expanded","true");
+ document.body.style.overflow="hidden";$("studioClose").focus();
+}
+function closeStudio(){
+ overlay.classList.remove("open");panel.classList.remove("open");
+ panel.setAttribute("aria-hidden","true");trigger.setAttribute("aria-expanded","false");
+ document.body.style.overflow="";
+ (previouslyFocused||trigger).focus();
+}
+trigger.addEventListener("click",()=>panel.classList.contains("open")?closeStudio():openStudio());
+$("studioClose").addEventListener("click",closeStudio);
+overlay.addEventListener("click",closeStudio);
+document.addEventListener("keydown",e=>{
+ if(!panel.classList.contains("open"))return;
+ if(e.key==="Escape"){e.preventDefault();closeStudio();}
+ if(e.key==="Tab"){
+  const focusables=[...panel.querySelectorAll("button:not(:disabled),input:not(:disabled)")];
+  const first=focusables[0],last=focusables[focusables.length-1];
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+ }
 });
-if(typeof media.addEventListener==="function"){
- media.addEventListener("change",e=>{if(!savedTheme())setTheme(e.matches?"dark":"light");});
+let startY=null;
+panel.addEventListener("touchstart",e=>{startY=panel.scrollTop===0?e.touches[0].clientY:null;},{passive:true});
+panel.addEventListener("touchend",e=>{
+ if(startY!==null&&window.innerWidth<=700&&e.changedTouches[0].clientY-startY>100)closeStudio();
+ startY=null;
+},{passive:true});
+document.querySelectorAll("[data-appearance]").forEach(b=>b.addEventListener("click",()=>{
+ studio.appearance=b.dataset.appearance;saveStudio();applyStudio();
+}));
+$("animationToggle").addEventListener("change",e=>{studio.animated=e.target.checked;saveStudio();applyStudio();});
+$("animationSpeed").addEventListener("input",e=>{studio.speed=Number(e.target.value);saveStudio();applyStudio();});
+$("studioReset").addEventListener("click",()=>{studio={...DEFAULT_STUDIO};saveStudio();applyStudio();});
+for(const m of [systemTheme,reducedMotion]){
+ if(m.addEventListener)m.addEventListener("change",applyStudio);
+ else if(m.addListener)m.addListener(applyStudio);
 }
 $("copyrightYear").textContent=new Date().getFullYear();
-initTheme();
+renderPalettes();applyStudio();
 
 async function start(){
  hideDynamic();
