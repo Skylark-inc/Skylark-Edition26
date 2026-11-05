@@ -9,6 +9,20 @@
 <title>Skylark Edition 26</title>
 <link rel="icon" type="image/png" href="skylark-edition26-favicon.png">
 <link rel="apple-touch-icon" href="skylark-edition26-apple-touch-icon.png">
+<script>
+(function(){
+ try{
+  const saved=JSON.parse(localStorage.getItem("skylark-gradient-studio-v2")||"{}");
+  const legacy=JSON.parse(localStorage.getItem("skylark-gradient-studio-v1")||"{}");
+  const mode=["light","dark","system"].includes(saved.appearance)?saved.appearance:
+    (["light","dark","system"].includes(legacy.appearance)?legacy.appearance:"system");
+  document.documentElement.dataset.theme=mode==="system"?
+    (matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):mode;
+ }catch{
+  document.documentElement.dataset.theme=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
+ }
+})();
+</script>
 <style>
 :root{
  color-scheme:light dark;--background:#f5f5f7;--surface:rgba(255,255,255,.72);
@@ -177,9 +191,109 @@ html[data-theme="dark"] .studio-panel{background:rgba(28,28,30,.96);box-shadow:0
  html{scroll-behavior:auto}.gradient{animation:none}
  *,*:before,*:after{transition-duration:.01ms!important}
 }
+
+/* Gradient Studio v2: full-page coordinated appearance */
+:root{
+ --accent:#176cdb;--accent-hover:#095bbd;--accent-ink:#fff;
+ --title-1:#007aff;--title-2:#42c9ff;--title-3:#927cff;
+ --ambient-opacity:.58;--ambient-blur:46px;
+ --card-tint:rgba(55,130,220,.045);--card-border:rgba(52,122,219,.14);
+ --gradient-speed:20s;--gradient-play:running
+}
+html[data-theme="dark"]{
+ --accent:#64b4ff;--accent-hover:#86c6ff;--accent-ink:#071522;
+ --ambient-opacity:.45;--ambient-blur:48px;
+ --card-tint:rgba(30,100,180,.085);--card-border:rgba(105,160,225,.16)
+}
+html{background:var(--background)}
+body{background:transparent}
+body > nav,body > main,body > footer{position:relative;z-index:1}
+body > nav.topbar{position:absolute;z-index:20}
+.ambient-background{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+ opacity:var(--ambient-opacity);transition:opacity .4s}
+.ambient-blob{position:absolute;display:block;width:100vmax;height:100vmax;
+ max-width:1250px;max-height:1250px;min-width:580px;min-height:580px;
+ border-radius:50%;filter:blur(var(--ambient-blur));will-change:transform;
+ animation-duration:var(--gradient-speed);animation-timing-function:ease-in-out;
+ animation-iteration-count:infinite;animation-direction:alternate;
+ animation-play-state:var(--gradient-play)}
+.ambient-blob.one{top:-35vmax;left:-32vmax;
+ background:radial-gradient(circle,var(--cyan) 0%,transparent 62%);
+ animation-name:ambient-one}
+.ambient-blob.two{top:-25vmax;right:-42vmax;
+ background:radial-gradient(circle,var(--purple) 0%,transparent 64%);
+ animation-name:ambient-two}
+.ambient-blob.three{top:28%;left:8%;
+ background:radial-gradient(circle,var(--sky) 0%,transparent 64%);
+ animation-name:ambient-three}
+.ambient-blob.four{top:70%;right:-32vmax;
+ background:radial-gradient(circle,var(--cyan) 0%,transparent 65%);
+ animation-name:ambient-four}
+@keyframes ambient-one{
+ from{transform:translate(-5%,-7%) scale(.85)}
+ to{transform:translate(36%,28%) scale(1.2)}
+}
+@keyframes ambient-two{
+ from{transform:translate(9%,-8%) scale(1.05)}
+ to{transform:translate(-38%,35%) scale(.85)}
+}
+@keyframes ambient-three{
+ from{transform:translate(-15%,-6%) scale(.88)}
+ to{transform:translate(18%,32%) scale(1.25)}
+}
+@keyframes ambient-four{
+ from{transform:translate(10%,-15%) scale(.9)}
+ to{transform:translate(-40%,-35%) scale(1.18)}
+}
+/* Remove the old hero-only glow and fade: the ambient gradient spans the page. */
+.hero .gradient,.hero:after{display:none}
+.hero{isolation:auto}
+.edition-number{
+ background:linear-gradient(115deg,var(--title-1) 4%,var(--title-2) 45%,var(--title-3) 92%);
+ background-clip:text;-webkit-background-clip:text;color:transparent
+}
+html[data-theme="dark"] .edition-number{
+ background:linear-gradient(115deg,var(--title-1) 4%,var(--title-2) 45%,var(--title-3) 92%);
+ background-clip:text;-webkit-background-clip:text;color:transparent
+}
+.download-button{background:var(--accent);color:var(--accent-ink);
+ box-shadow:0 8px 24px color-mix(in srgb,var(--accent) 24%,transparent)}
+.download-button:hover:not(:disabled){background:var(--accent-hover);
+ box-shadow:0 11px 28px color-mix(in srgb,var(--accent) 28%,transparent)}
+a{color:var(--accent)}
+.brand{color:var(--text)}
+.palette-option[aria-pressed="true"] .palette-swatch{
+ border-color:var(--accent);box-shadow:0 0 0 2px var(--background),0 0 0 4px var(--accent)}
+.studio-range{accent-color:var(--accent)}
+.feature-card,.social-card{
+ background:linear-gradient(135deg,var(--card-tint),transparent 65%),var(--surface);
+ border-color:var(--card-border);
+ backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)
+}
+.notice:not(.warning):not(.danger){border-color:var(--card-border)}
+.studio-note[hidden]{display:none}
+.studio-note.dark-note{padding:10px 12px;border-radius:11px;
+ background:var(--card-tint);border:1px solid var(--card-border)}
+@media(prefers-reduced-motion:reduce){
+ .ambient-blob{animation:none!important;will-change:auto}
+}
+@media(max-width:600px){
+ .ambient-blob{min-width:470px;min-height:470px;width:130vw;height:130vw}
+ .ambient-blob.one{top:-15%;left:-60%}
+ .ambient-blob.two{top:0;right:-65%}
+ .ambient-blob.three{top:32%;left:-38%}
+ .ambient-blob.four{top:73%;right:-60%}
+}
+
 </style>
 </head>
 <body>
+<div class="ambient-background" aria-hidden="true">
+ <span class="ambient-blob one"></span>
+ <span class="ambient-blob two"></span>
+ <span class="ambient-blob three"></span>
+ <span class="ambient-blob four"></span>
+</div>
 <nav class="topbar">
  <a class="brand" href="https://skylark-inc.github.io/">Skylark</a>
  <button class="theme-toggle studio-trigger" id="themeToggle" type="button" aria-label="Open Gradient Studio" title="Gradient Studio" aria-controls="gradientStudio" aria-expanded="false">
@@ -409,56 +523,119 @@ function showNewEdition(entry){
  $("newEditionLink").href=pageFor(entry);
  show("newEditionNotice");
 }
-/* Gradient Studio is independent of edition loading and download routing. */
+/* Gradient Studio: appearance, palette, and independent motion settings. */
 const PALETTES=[
- {id:"skylark",name:"Skylark",light:["#7ee8ff","#a998ff","#54aaff"],dark:["#138aa9","#6754c5","#1378c5"]},
- {id:"sunset",name:"Sunset",light:["#ff956c","#ffd38a","#d4a5ff"],dark:["#c4533e","#bd7b24","#7950b8"]},
- {id:"ocean",name:"Ocean",light:["#217dd1","#58d9d0","#8aafff"],dark:["#135aa4","#0a9b91","#4b64bd"]},
- {id:"rose",name:"Rose",light:["#ff78b2","#ffc3d7","#bc95ff"],dark:["#b92c72","#a94778","#7353bd"]},
- {id:"aurora",name:"Aurora",light:["#58dcb2","#72baff","#aa8bff"],dark:["#159b79","#306cbe","#6550bb"]},
- {id:"ember",name:"Ember",light:["#ff754e","#ffbb69","#e66a9a"],dark:["#b9432d","#b46a22","#a83d71"]},
- {id:"lavender",name:"Lavender",light:["#a88bff","#d3b6ff","#8faeff"],dark:["#6852bc","#8765b8","#4a68b0"]},
- {id:"mint",name:"Mint",light:["#5dd8b0","#9cebd3","#76c9ed"],dark:["#148f72","#3c9c87","#277caa"]}
+ {id:"skylark",name:"Skylark",
+  light:["#7ee8ff","#a998ff","#54aaff"],dark:["#137d9e","#6754bc","#1268b2"],
+  accentLight:"#176cdb",accentDark:"#70baff"},
+ {id:"sunset",name:"Sunset",
+  light:["#ff956c","#ffd38a","#d4a5ff"],dark:["#b94b38","#b77b28","#764bb0"],
+  accentLight:"#a94624",accentDark:"#ffad7b"},
+ {id:"ocean",name:"Ocean",
+  light:["#217dd1","#58d9d0","#8aafff"],dark:["#14558c","#087f7b","#455da5"],
+  accentLight:"#096e90",accentDark:"#69d9cf"},
+ {id:"rose",name:"Rose",
+  light:["#ff78b2","#ffc3d7","#bc95ff"],dark:["#a82766","#a74874","#6949a6"],
+  accentLight:"#aa316b",accentDark:"#ffa2ce"},
+ {id:"aurora",name:"Aurora",
+  light:["#58dcb2","#72baff","#aa8bff"],dark:["#12856e","#2c62ad","#5945a3"],
+  accentLight:"#137a68",accentDark:"#7deac6"},
+ {id:"ember",name:"Ember",
+  light:["#ff754e","#ffbb69","#e66a9a"],dark:["#aa3d2a","#ad651f","#963466"],
+  accentLight:"#a83b22",accentDark:"#ffac79"},
+ {id:"lavender",name:"Lavender",
+  light:["#a88bff","#d3b6ff","#8faeff"],dark:["#604bb0","#7959aa","#455e9f"],
+  accentLight:"#6544b6",accentDark:"#c2a9ff"},
+ {id:"mint",name:"Mint",
+  light:["#5dd8b0","#9cebd3","#76c9ed"],dark:["#117e69","#318d7c","#226d98"],
+  accentLight:"#087c66",accentDark:"#7ce9c3"}
 ];
-const DEFAULT_STUDIO={appearance:"system",palette:"skylark",speed:20,animated:true};
-const STUDIO_KEY="skylark-gradient-studio-v1";
+const STUDIO_KEY="skylark-gradient-studio-v2";
+const DEFAULT_STUDIO={
+ appearance:"system",palette:"skylark",
+ light:{speed:20,animated:true},dark:{speed:40,animated:false}
+};
 const systemTheme=window.matchMedia("(prefers-color-scheme: dark)");
 const reducedMotion=window.matchMedia("(prefers-reduced-motion: reduce)");
+const root=document.documentElement;
 function readStored(key){try{return localStorage.getItem(key);}catch{return null;}}
-function saveStudio(){try{localStorage.setItem(STUDIO_KEY,JSON.stringify(studio));}catch{}}
+function cloneDefaults(){return JSON.parse(JSON.stringify(DEFAULT_STUDIO));}
+function normalizeMotion(raw,fallback){
+ const speed=Number(raw?.speed);
+ return {
+  speed:Number.isFinite(speed)?Math.max(5,Math.min(60,Math.round(speed))):fallback.speed,
+  animated:typeof raw?.animated==="boolean"?raw.animated:fallback.animated
+ };
+}
 function loadStudio(){
  let input={};
  try{input=JSON.parse(readStored(STUDIO_KEY)||"{}")||{};}catch{}
+ let previous={};
+ try{previous=JSON.parse(readStored("skylark-gradient-studio-v1")||"{}")||{};}catch{}
  const legacy=readStored("skylark-theme");
  const appearance=["light","dark","system"].includes(input.appearance)?input.appearance:
-  (["light","dark"].includes(legacy)?legacy:"system");
+  (["light","dark","system"].includes(previous.appearance)?previous.appearance:
+   (["light","dark"].includes(legacy)?legacy:"system"));
+ const palette=PALETTES.some(p=>p.id===input.palette)?input.palette:
+  (PALETTES.some(p=>p.id===previous.palette)?previous.palette:"skylark");
+ const lightLegacy={
+  speed:previous.speed,animated:previous.animated
+ };
  return {
-  appearance,
-  palette:PALETTES.some(p=>p.id===input.palette)?input.palette:"skylark",
-  speed:Number.isFinite(Number(input.speed))?Math.max(5,Math.min(60,Number(input.speed))):20,
-  animated:typeof input.animated==="boolean"?input.animated:true
+  appearance,palette,
+  light:normalizeMotion(input.light||lightLegacy,DEFAULT_STUDIO.light),
+  dark:normalizeMotion(input.dark,DEFAULT_STUDIO.dark)
  };
 }
 let studio=loadStudio();
+function saveStudio(){try{localStorage.setItem(STUDIO_KEY,JSON.stringify(studio));}catch{}}
 const panel=$("gradientStudio"),overlay=$("studioOverlay"),trigger=$("themeToggle");
-function resolvedTheme(){return studio.appearance==="system"?(systemTheme.matches?"dark":"light"):studio.appearance;}
+function resolvedTheme(){
+ return studio.appearance==="system"?(systemTheme.matches?"dark":"light"):studio.appearance;
+}
+function mixHex(a,b,t){
+ const rgb=s=>[1,3,5].map(i=>parseInt(s.slice(i,i+2),16));
+ const x=rgb(a),y=rgb(b);
+ return "#"+x.map((n,i)=>Math.round(n+(y[i]-n)*t).toString(16).padStart(2,"0")).join("");
+}
 function applyStudio(){
  const theme=resolvedTheme(),palette=PALETTES.find(p=>p.id===studio.palette)||PALETTES[0];
- document.documentElement.dataset.theme=theme;
- document.documentElement.style.colorScheme=theme;
- const colors=palette[theme];
- document.documentElement.style.setProperty("--cyan",colors[0]);
- document.documentElement.style.setProperty("--purple",colors[1]);
- document.documentElement.style.setProperty("--sky",colors[2]);
- document.documentElement.style.setProperty("--gradient-speed",studio.speed+"s");
- document.documentElement.style.setProperty("--gradient-play",studio.animated&&!reducedMotion.matches?"running":"paused");
- $("animationSpeed").value=String(studio.speed);
- $("speedValue").textContent=studio.speed+"s";
- $("animationToggle").checked=studio.animated;
- $("animationSpeed").disabled=!studio.animated;
+ const motion=studio[theme],colors=palette[theme];
+ root.dataset.theme=theme;
+ root.style.colorScheme=theme;
+ root.style.setProperty("--cyan",colors[0]);
+ root.style.setProperty("--purple",colors[1]);
+ root.style.setProperty("--sky",colors[2]);
+ root.style.setProperty("--title-1",colors[2]);
+ root.style.setProperty("--title-2",colors[0]);
+ root.style.setProperty("--title-3",colors[1]);
+ const accent=theme==="dark"?palette.accentDark:palette.accentLight;
+ root.style.setProperty("--accent",accent);
+ root.style.setProperty("--accent-hover",mixHex(accent,theme==="dark"?"#ffffff":"#000000",.13));
+ root.style.setProperty("--accent-ink",theme==="dark"?"#101218":"#ffffff");
+ root.style.setProperty("--card-tint",
+  theme==="dark"?"color-mix(in srgb,"+colors[2]+" 9%,transparent)":
+    "color-mix(in srgb,"+colors[2]+" 6%,transparent)");
+ root.style.setProperty("--card-border",
+  "color-mix(in srgb,"+colors[2]+" "+(theme==="dark"?25:19)+"%,transparent)");
+ root.style.setProperty("--ambient-opacity",theme==="dark"?".46":".62");
+ root.style.setProperty("--gradient-speed",motion.speed+"s");
+ root.style.setProperty("--gradient-play",motion.animated&&!reducedMotion.matches?"running":"paused");
+ $("animationSpeed").value=String(motion.speed);
+ $("speedValue").textContent=motion.speed+"s";
+ $("animationToggle").checked=motion.animated;
+ $("animationSpeed").disabled=!motion.animated||reducedMotion.matches;
  $("motionNote").hidden=!reducedMotion.matches;
- document.querySelectorAll("[data-appearance]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.appearance===studio.appearance)));
- document.querySelectorAll("[data-palette]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.palette===studio.palette)));
+ $("darkAnimationNote").hidden=theme!=="dark";
+ document.querySelectorAll("[data-appearance]").forEach(b=>
+  b.setAttribute("aria-pressed",String(b.dataset.appearance===studio.appearance)));
+ document.querySelectorAll("[data-palette]").forEach(b=>
+  b.setAttribute("aria-pressed",String(b.dataset.palette===studio.palette)));
+ document.querySelectorAll("[data-palette]").forEach(b=>{
+  const palette=PALETTES.find(p=>p.id===b.dataset.palette);
+  const swatch=b.querySelector(".palette-swatch");
+  if(palette&&swatch)swatch.style.background=`linear-gradient(135deg,${palette[theme].join(",")})`;
+ });
 }
 function renderPalettes(){
  const grid=$("paletteGrid");
@@ -466,7 +643,6 @@ function renderPalettes(){
   const b=document.createElement("button");b.type="button";b.className="palette-option";
   b.dataset.palette=p.id;b.setAttribute("aria-label",p.name+" palette");b.setAttribute("aria-pressed","false");
   const swatch=document.createElement("span");swatch.className="palette-swatch";
-  swatch.style.background=`linear-gradient(135deg,${p.light.join(",")})`;
   const name=document.createElement("span");name.textContent=p.name;
   b.append(swatch,name);
   b.addEventListener("click",()=>{studio.palette=p.id;saveStudio();applyStudio();});
@@ -500,7 +676,9 @@ document.addEventListener("keydown",e=>{
  }
 });
 let startY=null;
-panel.addEventListener("touchstart",e=>{startY=panel.scrollTop===0?e.touches[0].clientY:null;},{passive:true});
+panel.addEventListener("touchstart",e=>{
+ startY=panel.scrollTop===0?e.touches[0].clientY:null;
+},{passive:true});
 panel.addEventListener("touchend",e=>{
  if(startY!==null&&window.innerWidth<=700&&e.changedTouches[0].clientY-startY>100)closeStudio();
  startY=null;
@@ -508,9 +686,15 @@ panel.addEventListener("touchend",e=>{
 document.querySelectorAll("[data-appearance]").forEach(b=>b.addEventListener("click",()=>{
  studio.appearance=b.dataset.appearance;saveStudio();applyStudio();
 }));
-$("animationToggle").addEventListener("change",e=>{studio.animated=e.target.checked;saveStudio();applyStudio();});
-$("animationSpeed").addEventListener("input",e=>{studio.speed=Number(e.target.value);saveStudio();applyStudio();});
-$("studioReset").addEventListener("click",()=>{studio={...DEFAULT_STUDIO};saveStudio();applyStudio();});
+$("animationToggle").addEventListener("change",e=>{
+ studio[resolvedTheme()].animated=e.target.checked;saveStudio();applyStudio();
+});
+$("animationSpeed").addEventListener("input",e=>{
+ studio[resolvedTheme()].speed=Number(e.target.value);saveStudio();applyStudio();
+});
+$("studioReset").addEventListener("click",()=>{
+ studio=cloneDefaults();saveStudio();applyStudio();
+});
 for(const m of [systemTheme,reducedMotion]){
  if(m.addEventListener)m.addEventListener("change",applyStudio);
  else if(m.addListener)m.addListener(applyStudio);
