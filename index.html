@@ -322,6 +322,7 @@ a{color:var(--accent)}
  <div class="studio-range-ends"><span>Faster</span><span>Slower</span></div>
  <div class="studio-rule"></div>
  <button type="button" class="studio-reset" id="studioReset">Restore defaults</button>
+ <p class="studio-note dark-note" id="darkAnimationNote" hidden>Dark Mode starts with a still background for a calmer appearance. You can enable animation and adjust its speed at any time.</p>
  <p class="studio-note" id="motionNote" hidden>Reduce Motion is enabled on this device, so background animation is paused.</p>
 </aside>
 
@@ -626,7 +627,8 @@ function applyStudio(){
  $("animationToggle").checked=motion.animated;
  $("animationSpeed").disabled=!motion.animated||reducedMotion.matches;
  $("motionNote").hidden=!reducedMotion.matches;
- $("darkAnimationNote").hidden=theme!=="dark";
+ const darkNote=$("darkAnimationNote");
+ if(darkNote)darkNote.hidden=theme!=="dark";
  document.querySelectorAll("[data-appearance]").forEach(b=>
   b.setAttribute("aria-pressed",String(b.dataset.appearance===studio.appearance)));
  document.querySelectorAll("[data-palette]").forEach(b=>
@@ -700,7 +702,8 @@ for(const m of [systemTheme,reducedMotion]){
  else if(m.addListener)m.addListener(applyStudio);
 }
 $("copyrightYear").textContent=new Date().getFullYear();
-renderPalettes();applyStudio();
+try{renderPalettes();applyStudio();}
+catch(err){console.error("Gradient Studio initialization:",err);}
 
 async function start(){
  hideDynamic();
